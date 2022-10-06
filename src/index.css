@@ -1,0 +1,12 @@
+html {
+  background-color: #f1f1f1;
+}
+
+.content {
+  background-color: #f1f1f1;
+  padding-top: 2rem;
+}
+.featuredErrorMessage{
+  color: red;
+  margin-left: 30px;
+}
