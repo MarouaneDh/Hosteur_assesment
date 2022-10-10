@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { Button, Form, FormFeedback, FormGroup, Input, Label } from 'reactstrap';
 import { getMultiSelected, repeat } from '../../../utils';
-import { isCategoriesValid, isNameValid, isFeatured, isDateValid } from './validators';
+import { isCategoriesValid, isNameValid, isDateValid } from './validators';
 import { createProduct, updateProductForm } from '../../../actions/products';
 
 const ProductForm = (props) => {
@@ -15,13 +15,10 @@ const ProductForm = (props) => {
     const [receiptDate, setReceiptDate] = useState(product.receiptDate || '');
     const [expirationDate, setExpirationDate] = useState(product.expirationDate || '');
     const [featured, setFeatured] = useState(product.featured|| false);
-    const [validFeatured, setValidFeatured] = useState(false)
-    const [validNotFeatured, setValidNotFeatured] = useState(false)
     const [validExpDate, setValidExpDate] = useState(false)
 
     const onSubmit = (e) => {
         e.preventDefault();
-        if(isFeatured(rating) ===true && featured===true){
             if(isDateValid(expirationDate)){
                 if(type === 'add'){
                     dispatch(createProduct({
@@ -50,27 +47,21 @@ const ProductForm = (props) => {
             }else{
                 setValidExpDate(true)
             }
-        }else if(isFeatured(rating)===true && featured=== false){
-            setValidFeatured(true)
-        }else if(isFeatured(rating)===false && featured=== true){
-            setValidNotFeatured(true)
-        }
     }
-
-    useEffect(() => {
-      if(featured){
-        setValidFeatured(false)
-      }
-      if(!featured){
-        setValidNotFeatured(false)
-      }
-    }, [featured])
     
     useEffect(() => {
         if(isDateValid(expirationDate)){
             setValidExpDate(false)
         }
-      }, [expirationDate])
+    }, [expirationDate])
+
+    useEffect(() => {
+        if(rating>=8){
+            setFeatured(true)
+        }else{
+            setFeatured(false)
+        }
+    }, [rating, featured])
 
     var date = new Date();
     date.setDate(date.getDate() + 30)
@@ -78,8 +69,6 @@ const ProductForm = (props) => {
     let stringDate = date.toDateString()
 
     let expiration =`${stringDate.split(' ')[0]} ${stringDate.split(' ')[1]} ${stringDate.split(' ')[2]} ${stringDate.split(' ')[3]}`
-
-    console.log()
 
     return (
         <Form onSubmit={onSubmit}>
@@ -170,8 +159,6 @@ const ProductForm = (props) => {
                     />{' '}
                     Featured
                 </Label>
-                {validFeatured? <span className='featuredErrorMessage'>this product shoud be featured, please check the box before submitting your product or reduce the rating below 8</span>:null}
-                {validNotFeatured? <span className='featuredErrorMessage'>this product shoud not be featured, its rating is below 8, please uncheck the box before submitting your product or increase the rating over or equal to 8</span>:null}
             </FormGroup>
             
                 <Button>Submit</Button>
